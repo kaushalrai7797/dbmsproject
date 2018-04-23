@@ -14,7 +14,6 @@
             padding: 70px;
             margin: 0;
             font-family: roboto;
-            background-color: rgb(192, 197, 205)
         }
 
         h6 {
@@ -67,12 +66,46 @@
 
     </form>
 
+    <h2>Order : </h2>
+    <%dat.forEach(function(dat){%>
+    <h3> Bill No. <%=dat["billno"] %> <br> Restaurant : <%=dat["rname"] %> <%=dat["rid"] %> <br> Item : <%=dat["iname"]%> <%=dat["itemid"] %><br>Cost : <%=dat["cost"]%><br> Quantity : <%=dat["qty"]%><br></h3>
+    <% });%>
 
-    <h1> <%=data[0]['sum(cost*qty)']%> </h1>
+
+
+    <h3>Total :  <%=data[0]['sum(cost*qty)']%> </h3>
+
+
+    <form method="post" action="/delete">
+
+        <h2>Delete Order</h2>
+                <!--<input class="rounded bg-light col-8 my-4 p-2" id="new-item" name="new_bill" placeholder="billno">-->
+
+                <input class="rounded bg-light col-8 my-4 p-2" id="new-item" name="new_item" placeholder="enter itemid">
+
+                <input class="rounded bg-light col-8 my-4 p-2" id="new-res" name="new_res" placeholder="enter restid">
+
+                <input type="submit" class="btn btn-success" id="sub" value="delete">
+
+    </form>
+
+    <form method="post" action="/addm">
+
+        <h2>Add to Order</h2>
+        <!--<input class="rounded bg-light col-8 my-4 p-2" id="new-item" name="new_bill" placeholder="billno">-->
+
+        <input class="rounded bg-light col-8 my-4 p-2" id="new-item" name="new_item" placeholder="enter itemid">
+
+        <input class="rounded bg-light col-8 my-4 p-2" id="new-res" name="new_res" placeholder="enter restid">
+
+        <input class="rounded bg-light col-8 my-4 p-2" id="new-res" name="new_qty" placeholder="enter qty">
+
+        <input type="submit" class="btn btn-success" id="sub" value="add">
+
+
+    </form>
 
 </div>
-
-
 
 </body>
 

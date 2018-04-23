@@ -20,8 +20,6 @@
             /*background-color: rgb(192, 197, 205)*/
         }
 
-
-
         h6 {
             letter-spacing: 1.1px;
             font-weight: normal;
@@ -63,10 +61,14 @@
 
 </head>
 <body>
+
+
+
 <header class="bg-info text-center text-white p-4 mb-3">
     <h2>Food Ordering System</h2>
     <h6> A more compact way to keep track of orders! hi </h6>
 </header>
+
 +-----+-------------+       +--------+----------------------+<br>
 |rid  | rname       |       | itemid | iname                |<br>
 +-----+-------------+       +--------+----------------------+<br>
@@ -81,7 +83,9 @@
                             |      9 | Dosa                 |<br>
                             +--------+----------------------+<br>
 
-<br>
+<h3>Billno :  <%=data%> </h3>
+
+
 <div class="container bg-secondary pl-5" id="cont">
 
     <form id="add-list"  method="post" action="/sendorder">

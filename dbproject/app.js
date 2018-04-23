@@ -36,7 +36,7 @@ app.post("/billno" , function (req, res) {
         r= data[0].prim;
         r=r+1;
         // console.log(r + "inside");
-        res.render("order2");
+        res.render("ordernew" ,{data :r});
     })
 
 
@@ -107,16 +107,43 @@ app.post("/sendorder", function (req, res) {
 
 
 
-app.post ("/getamount", function (req, res) {
+app.post("/delete", function (req,res) {
 
-    con.query(`select sum(cost*qty) from (ordername as o,menu as m) where (o.rid=m.rid)and(o.itemid=m.itemid)and(billno=${req.body.new_item})`, function (err,data) {
-        console.log(data);
-        console.log(data[0]['sum(cost*qty)']);
-        res.render("amount2", {data : data});
+    con.query(`delete from ordername where (itemid =${req.body.new_item})and(rid=${req.body.new_res})and(billno=`+r+`)`, function (err,data) {
+        res.render("amount");
+    })
 
+
+})
+
+app.post("/addm", function (req,res) {
+
+    con.query(`insert into ordername values ( `+r+`,${req.body.new_item}, ${req.body.new_res}, ${req.body.new_qty} )`,function (err,data) {
+        res.render("amount");
 
     })
 
+
+
+})
+
+
+app.post ("/getamount", function (req, res) {
+
+    con.query(`select billno,r.rname,r.rid, i.itemid,i.iname,cost,qty from (ordername as o,menu as m, item as i, restaurant as r) where (o.rid=m.rid)and(o.itemid=m.itemid)and(i.itemid=o.itemid)and(r.rid=o.rid)and(billno=${req.body.new_item});`, function (err,dat) {
+
+        console.log(dat);
+
+        con.query(`select sum(cost*qty) from (ordername as o,menu as m) where (o.rid=m.rid)and(o.itemid=m.itemid)and(billno=${req.body.new_item})`, function (err,data) {
+
+            // console.log(data[0]['sum(cost*qty)']);
+            res.render("amount2", {data : data , dat : dat});
+
+
+        })
+
+    })
+    
 })
 
 
