@@ -1,31 +1,33 @@
-    var express = require('express');
-    var app = express();
-    var mysql = require('mysql');
-    var request = require('request');
-    var bodyParser = require("body-parser");
-    app.use(bodyParser.urlencoded({extended:true}));
+var express = require('express');
+var app = express();
+var mysql = require('mysql');
+var request = require('request');
+var bodyParser = require("body-parser");
+app.use(bodyParser.urlencoded({extended:true}));
 
-    app.set('view engine','ejs');
+app.set('view engine','ejs');
+var flag_invalidconsign=0;
+var cnt2=0;
+var cphone;
+var con = mysql.createConnection({
+    host: "localhost",
+    user: "kaushal7",
+    password: "1234",
+    insecureAuth: true,
+    database: "dbproject"
+});
 
-    var con = mysql.createConnection({
-        host: "localhost",
-        user: "kaushal7",
-        password: "1234",
-        insecureAuth: true,
-        database: "dbproject"
-    });
 
-
-    con.connect(function(err) {
-        if (err) {
-            throw err;
-            console.log(err);
-        }
-        console.log("Connected!");
-    });
+con.connect(function(err) {
+    if (err) {
+        throw err;
+        console.log(err);
+    }
+    console.log("Connected!");
+});
 
 app.get("/",function(req,res){
-    res.render("order2");
+    res.render("index");
 });
 
 var r=0;
@@ -62,48 +64,98 @@ app.post("/sendorder", function (req, res) {
         // console.log(r + "inside");
         con.query(`insert into ordername values (`+r+` ,${req.body.new_item}, ${req.body.new_item2}, ${req.body.new_item3} )`, function (err,data) {
 
-             console.log(err);
-             console.log(data);
+            console.log(err);
+            console.log(data);
 
         })
 
 
     });
 
-     res.render("order2");
+    res.render("order2");
 })
 
 
-    app.get("/empform", function (req, res) {
-            res.render("employee")
-    })
+app.get("/emp_entry", function (req, res) {
+    res.render("employee")
+})
 
 
-
-
-
-    app.post("/empentry",function(req,res){
-
-        con.query('select distinct(count(eid)) as prim from employee',function(err,data){
-            r= data[0].prim;
-            r=r+1;
-            eid=r;
-            ename = req.body.name;
-            ephone = req.body.phone;
-            houseno=req.body.phone;
-            pincode = req.body.pincode;
-            dept = req.body.dept;
-            var sql = 'insert into employee set ?';
-            var x = {eid:r,ename:ename,ephone:ephone,houseno:houseno,pincode:pincode,dept:dept};
-            con.query(sql,x, function(err, result){
-                if (err)
-                    console.log(err);
-                console.log(result);
-            });
-
-            res.render("employee");
-        });
+app.get("/cust_match",function(req,res){
+    res.render("cust_match",{flag_invalidconsign:flag_invalidconsign,cnt2:cnt2});
+    cnt2=0;
+});
+app.get("/customer_form",function(req,res){
+    res.render("customer_form");
+});
+app.post("/customer_form",function(req,res){
+    var cname,cemail;
+    cname = req.body.cname;
+    cemail = req.body.cemail;
+    var x = {cphone:cphone,cname:cname,cemail:cemail};
+    console.log(req.body);
+    console.log(cphone);
+    con.query('insert into customer set ?',x, function(err, result){
+        //if (err) throw err;
+        //console.log(result);
+        return res.redirect("/order2");
     });
+});
+app.get("/order2",function(req,res){
+    res.render("order2");
+});
+app.post("/cust_match",function(req,res){
+    var x = req.body.cphone;
+    cphone = x;
+    console.log(cphone);
+    con.query('select * from customer where customer.cphone=?',[x], function(err, result){
+        if(result.length == 0){
+            return res.redirect("/customer_form");
+        }
+        else{
+            return res.redirect("/order2");
+        }
+    });
+});
+app.get("/display_menu", function (req, res) {
+    con.query('select rname,iname,cost from menu as m,restaurant as r,item as i where m.rid=r.rid and m.itemid=i.itemid', function(err, result){
+        console.log(result);
+        res.render("display_menu",{result:result});
+    });
+})
+
+app.get("/view_emp", function (req, res) {
+    con.query('select ename,ephone,dept from employee', function(err, result){
+        console.log(result);
+        res.render("view_emp",{result:result});
+    });
+})
+app.post("/empentry",function(req,res){
+
+    con.query('select distinct(count(eid)) as prim from employee',function(err,data){
+        r= data[0].prim;
+        r=r+1;
+        eid=r;
+        ename = req.body.name;
+        ephone = req.body.phone;
+        houseno=req.body.phone;
+        pincode = req.body.pincode;
+        dept = req.body.dept;
+        var sql = 'insert into employee set ?';
+        var x = {eid:r,ename:ename,ephone:ephone,houseno:houseno,pincode:pincode,dept:dept};
+        con.query(sql,x, function(err, result){
+            if (err)
+                console.log(err);
+            console.log(result);
+        });
+
+        res.render("employee");
+    });
+});
+
+
+
+
 
 
 
@@ -116,6 +168,7 @@ app.post("/delete", function (req,res) {
 
 })
 
+
 app.post("/addm", function (req,res) {
 
     con.query(`insert into ordername values ( `+r+`,${req.body.new_item}, ${req.body.new_res}, ${req.body.new_qty} )`,function (err,data) {
@@ -126,6 +179,7 @@ app.post("/addm", function (req,res) {
 
 
 })
+
 
 
 app.post ("/getamount", function (req, res) {
@@ -143,11 +197,9 @@ app.post ("/getamount", function (req, res) {
         })
 
     })
-    
+
 })
 
-
-
-app.listen(7402 || process.env.PORT,function(){
+app.listen(7403 || process.env.PORT,function(){
     console.log("running....");
 });
