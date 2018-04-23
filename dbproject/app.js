@@ -109,10 +109,15 @@ app.post("/sendorder", function (req, res) {
 
 app.post ("/getamount", function (req, res) {
 
-    con.query()
+    con.query(`select sum(cost*qty) from (ordername as o,menu as m) where (o.rid=m.rid)and(o.itemid=m.itemid)and(billno=${req.body.new_item})`, function (err,data) {
+        console.log(data);
+        console.log(data[0]['sum(cost*qty)']);
+        res.render("amount2", {data : data});
+
+
+    })
 
 })
-
 
 
 
